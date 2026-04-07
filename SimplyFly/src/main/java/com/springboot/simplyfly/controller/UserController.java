@@ -3,7 +3,9 @@ package com.springboot.simplyfly.controller;
 import com.springboot.simplyfly.dto.UserPageDto;
 import com.springboot.simplyfly.dto.UserReqDto;
 import com.springboot.simplyfly.dto.UserResDto;
+import com.springboot.simplyfly.dto.UserSignUpDto;
 import com.springboot.simplyfly.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +32,10 @@ public class UserController {
     @GetMapping("/get/{id}")
     public UserResDto getUserById(@PathVariable long id){
         return userService.getUserById(id);
+    }
+
+    @PostMapping("/sign-up")
+    public void addUserWithCredentials(@Valid @RequestBody UserSignUpDto userSignUpDto){
+        userService.userSignUp(userSignUpDto);
     }
 }

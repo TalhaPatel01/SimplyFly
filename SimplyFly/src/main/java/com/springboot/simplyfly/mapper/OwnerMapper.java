@@ -8,7 +8,6 @@ public class OwnerMapper {
 
     public static Owner mapToEntity(OwnerReqDto ownerReqDto){
         Owner owner = new Owner();
-        owner.setPassword(ownerReqDto.password());
         owner.setEmail(ownerReqDto.email());
         owner.setAirline_name(ownerReqDto.airline_name());
         owner.setPhone(ownerReqDto.phone());

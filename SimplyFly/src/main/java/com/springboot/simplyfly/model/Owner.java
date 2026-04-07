@@ -19,5 +19,7 @@ public class Owner {
     private String airline_name;
     private String email;
     private String phone;
-    private String password;
+
+    @OneToOne
+    private AppUser appUser;
 }

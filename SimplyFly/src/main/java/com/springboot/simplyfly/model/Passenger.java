@@ -11,15 +11,20 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Passenger {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long user_id;
+    private long id;
 
     private String name;
-    private String email;
-    private String phone_no;
+    private int age;
+    private String gender;
+
+    @ManyToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
 
     @OneToOne
-    private AppUser appUser;
+    @JoinColumn(name = "seat_id")
+    private Seat seat;
 }

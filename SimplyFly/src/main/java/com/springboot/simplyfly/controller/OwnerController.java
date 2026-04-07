@@ -31,4 +31,7 @@ public class OwnerController {
     public OwnerResDto getByOwnerId(@PathVariable long id){
         return ownerService.getByOwnerId(id);
     }
+
+//    @PostMapping("/sign-up")
+//    public void addOwnerWithCredentials()
 }

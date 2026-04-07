@@ -11,15 +11,18 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Route {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long user_id;
+    private long route_id;
 
-    private String name;
-    private String email;
-    private String phone_no;
+    @ManyToOne
+    @JoinColumn(name="source_airport_id",nullable = false)
+    private Airport sourceAirport;
 
-    @OneToOne
-    private AppUser appUser;
+    @ManyToOne
+    @JoinColumn(name="destination_airport_id",nullable = false)
+    private Airport destinationAirport;
+
+    private double distance;
 }
