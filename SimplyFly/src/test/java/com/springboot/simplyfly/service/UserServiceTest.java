@@ -1,7 +1,9 @@
 package com.springboot.simplyfly.service;
 
 import com.springboot.simplyfly.dto.UserResDto;
+import com.springboot.simplyfly.enums.Role;
 import com.springboot.simplyfly.exception.ResourceNotFoundException;
+import com.springboot.simplyfly.model.AppUser;
 import com.springboot.simplyfly.model.User;
 import com.springboot.simplyfly.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -30,16 +32,21 @@ public class UserServiceTest {
 
     @Test
     public void getAllUsersTest(){
+        AppUser appUser = new AppUser();
+        appUser.setRole(Role.USER);
+
         User user1 = new User();
         user1.setUser_id(18L);
         user1.setName("Harry");
         user1.setEmail("harry@gmail.com");
         user1.setPhone_no("9876543210");
+        user1.setAppUser(appUser);
         User user2 = new User();
         user2.setUser_id(19L);
         user2.setName("Barren");
         user2.setEmail("barren@gmail.com");
         user2.setPhone_no("9123456780");
+        user2.setAppUser(appUser);
         List<User> list = List.of(user1,user2);
 
         Page<User> pageUser = new PageImpl<>(list);
@@ -48,15 +55,19 @@ public class UserServiceTest {
 
         Pageable pageable = PageRequest.of(page,size);
 
-        when(userRepository.findAll(pageable)).thenReturn(pageUser);
+        when(userRepository.findAllUsers(pageable)).thenReturn(pageUser);
         Assertions.assertEquals(2,userService.getAllUsers(0,2).list().size());
     }
 
     @Test
     public void getUserByIdWhenExist(){
+        AppUser appUser = new AppUser();
+        appUser.setUsername("harry123");
+
         User user1 = new User();
         user1.setUser_id(18L);
         user1.setName("Harry");
+        user1.setAppUser(appUser);
         user1.setEmail("harry@gmail.com");
         user1.setPhone_no("9876543210");
 
@@ -64,6 +75,7 @@ public class UserServiceTest {
 
         UserResDto dto = new UserResDto(
                 user1.getUser_id(),
+                user1.getAppUser().getUsername(),
                 user1.getName(),
                 user1.getEmail(),
                 user1.getPhone_no()
@@ -72,6 +84,7 @@ public class UserServiceTest {
 
         UserResDto dto1 = new UserResDto(
                 user1.getUser_id(),
+                user1.getAppUser().getUsername(),
                 user1.getName(),
                 "1@gmail.com",
                 user1.getPhone_no()

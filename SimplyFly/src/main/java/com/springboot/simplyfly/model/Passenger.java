@@ -1,5 +1,6 @@
 package com.springboot.simplyfly.model;
 
+import com.springboot.simplyfly.enums.PassengerType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,9 @@ public class Passenger {
     private String name;
     private int age;
     private String gender;
+
+    @Enumerated(EnumType.STRING)
+    private PassengerType passengerType;
 
     @ManyToOne
     @JoinColumn(name = "booking_id")

@@ -28,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AppUserService appUserService;
+    private final AppUserRepository appUserRepository;
 
     public void addUser(UserReqDto userReqDto) {
         User user = UserMapper.mapToEntity(userReqDto);
@@ -36,7 +37,7 @@ public class UserService {
 
     public UserPageDto getAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<User> user = userRepository.findAll(pageable);
+        Page<User> user = userRepository.findAllUsers(pageable);
         long totalRecords = user.getTotalElements();
         int totalPages = user.getTotalPages();
 
@@ -58,6 +59,7 @@ public class UserService {
 
         return new UserResDto(
              user.getUser_id(),
+             user.getAppUser().getUsername(),
              user.getName(),
                 user.getEmail(),
                 user.getPhone_no()

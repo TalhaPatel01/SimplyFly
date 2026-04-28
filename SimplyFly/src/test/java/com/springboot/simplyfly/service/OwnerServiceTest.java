@@ -1,7 +1,9 @@
 package com.springboot.simplyfly.service;
 
 import com.springboot.simplyfly.dto.OwnerResDto;
+import com.springboot.simplyfly.enums.Role;
 import com.springboot.simplyfly.exception.ResourceNotFoundException;
+import com.springboot.simplyfly.model.AppUser;
 import com.springboot.simplyfly.model.Owner;
 import com.springboot.simplyfly.repository.OwnerRepository;
 import org.junit.jupiter.api.Assertions;
@@ -29,16 +31,21 @@ public class OwnerServiceTest {
 
     @Test
     public void getAllOwnersTest(){
+        AppUser appUser = new AppUser();
+        appUser.setRole(Role.OWNER);
+
         Owner owner1 = new Owner();
         owner1.setOwner_id(18L);
         owner1.setAirline_name("Air India");
         owner1.setEmail("air.india@gmail.com");
         owner1.setPhone("9876543210");
+        owner1.setAppUser(appUser);
         Owner owner2 = new Owner();
         owner2.setOwner_id(19L);
         owner2.setAirline_name("Indigo");
         owner2.setEmail("indigo@gmail.com");
         owner2.setPhone("9123456780");
+        owner2.setAppUser(appUser);
         List<Owner> list = List.of(owner1,owner2);
 
         Page<Owner> pageOwner = new PageImpl<>(list);
@@ -47,22 +54,27 @@ public class OwnerServiceTest {
 
         Pageable pageable = PageRequest.of(page,size);
 
-        when(ownerRepository.findAll(pageable)).thenReturn(pageOwner);
+        when(ownerRepository.findAllOwner(pageable)).thenReturn(pageOwner);
         Assertions.assertEquals(2,ownerService.getAllOwners(0,2).list().size());
     }
 
     @Test
     public void getOwnerByIdWhenExist(){
+        AppUser appUser = new AppUser();
+        appUser.setUsername("airindia");
+
         Owner owner1 = new Owner();
         owner1.setOwner_id(18L);
         owner1.setAirline_name("Air India");
         owner1.setEmail("air.india@gmail.com");
         owner1.setPhone("9876543210");
+        owner1.setAppUser(appUser);
 
         when(ownerRepository.findById(18L)).thenReturn(Optional.of(owner1));
 
         OwnerResDto dto = new OwnerResDto(
               owner1.getOwner_id(),
+              owner1.getAppUser().getUsername(),
               owner1.getAirline_name(),
               owner1.getEmail(),
               owner1.getPhone()
@@ -71,6 +83,7 @@ public class OwnerServiceTest {
 
         OwnerResDto dto1 = new OwnerResDto(
                 owner1.getOwner_id(),
+                owner1.getAppUser().getUsername(),
                 owner1.getAirline_name(),
                 "1@gmail.com",
                 owner1.getPhone()

@@ -2,6 +2,7 @@ package com.springboot.simplyfly.service;
 
 import com.springboot.simplyfly.dto.AirportPageDto;
 import com.springboot.simplyfly.dto.AirportReqDto;
+import com.springboot.simplyfly.dto.AirportResDto;
 import com.springboot.simplyfly.exception.ResourceNotFoundException;
 import com.springboot.simplyfly.mapper.AirportMapper;
 import com.springboot.simplyfly.model.Airport;
@@ -42,5 +43,13 @@ public class AirportService {
     public Airport getAirportById(long id) {
         return airportRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Invalid airport id"));
+    }
+
+    public List<AirportResDto> getAirports() {
+        List<Airport> list = airportRepository.findAll();
+        return list
+                .stream()
+                .map(AirportMapper::mapToDto)
+                .toList();
     }
 }

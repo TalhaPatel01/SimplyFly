@@ -30,8 +30,22 @@ public class RouteFlight {
     @Column(name = "available_seats")
     private int availableSeats;
 
+    private int totalRows;
+    private int firstClassRows;
+    private int businessClassRows;
+    private int premiumEconomyRows;
+    private int economyRows;
+    private String columns;
+
     private int duration;
+
     private double fare;
+    private double premiumEconomyFare;
+    private double businessClassFare;
+    private double firstClassFare;
+
+    private double childFactor;
+    private double infantFactor;
 
     @ManyToOne
     @JoinColumn(name = "route_id")

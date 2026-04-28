@@ -1,23 +1,30 @@
 package com.springboot.simplyfly.controller;
 
 import com.springboot.simplyfly.dto.FlightResDto;
+import com.springboot.simplyfly.dto.FlightResPageDto;
 import com.springboot.simplyfly.service.FlightService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/flight")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173/")
 public class FlightController {
     private final FlightService flightService;
 
-    @GetMapping("/owner/{ownerId}")
-    public List<FlightResDto> getFlightsByOwner(@PathVariable int ownerId){
-        return flightService.getFlightsByOwner(ownerId);
+    @GetMapping("/get-by-owner")
+    public FlightResPageDto getFlightsByOwner(Principal principal, @RequestParam (value = "page", required = false, defaultValue = "0") int page,
+                                                    @RequestParam (value = "size", required = false, defaultValue = "0") int size){
+        String username = principal.getName();
+        return flightService.getFlightsByOwner(username, page, size);
+    }
+
+    @GetMapping("/get-details/{routeFlightId}")
+    public FlightResDto getFlightDetailsById(Principal principal, @PathVariable long routeFlightId){
+        String username = principal.getName();
+        return flightService.getFlightDetailsById(username,routeFlightId);
     }
 }

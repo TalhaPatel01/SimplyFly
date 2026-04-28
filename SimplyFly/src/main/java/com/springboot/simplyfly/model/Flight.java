@@ -28,4 +28,7 @@ public class Flight {
 
     @Column(name = "baggage_allowed")
     private int baggageAllowed;
+
+    @Column(name = "hand_carry_allowed")
+    private int handCarryAllowed;
 }

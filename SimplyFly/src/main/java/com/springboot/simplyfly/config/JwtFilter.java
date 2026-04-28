@@ -7,20 +7,31 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
 @Component
-@AllArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtility jwtUtility;
     private final AppUserService appUserService;
+
+    public JwtFilter(JwtUtility jwtUtility, AppUserService appUserService) {
+        this.jwtUtility = jwtUtility;
+        this.appUserService = appUserService;
+    }
+
+    @Autowired
+    @Qualifier("handlerExceptionResolver") // this qualifies to be used directly
+    private HandlerExceptionResolver resolver;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -53,7 +64,8 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
         }
         catch(Exception e){
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
+            resolver.resolveException(request, response, null, e);
         }
     }
 }

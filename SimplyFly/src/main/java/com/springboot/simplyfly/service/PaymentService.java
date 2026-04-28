@@ -1,7 +1,9 @@
 package com.springboot.simplyfly.service;
 
+import com.springboot.simplyfly.dto.PaymentDto;
 import com.springboot.simplyfly.dto.TicketDto;
 import com.springboot.simplyfly.enums.*;
+import com.springboot.simplyfly.exception.BookingNotCancelledException;
 import com.springboot.simplyfly.exception.ResourceNotFoundException;
 import com.springboot.simplyfly.exception.UnauthorizedAccessException;
 import com.springboot.simplyfly.model.*;
@@ -13,6 +15,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.springboot.simplyfly.enums.BookingStatus.CANCELLED;
+
 @Service
 @AllArgsConstructor
 public class PaymentService {
@@ -22,8 +26,8 @@ public class PaymentService {
     private final TicketRepository ticketRepository;
     private final PaymentRepository paymentRepository;
 
-    public TicketDto makePayment(long bookingId, String username) {
-        Booking booking = bookingRepository.findById(bookingId)
+    public TicketDto makePayment(PaymentDto paymentDto, String username) {
+        Booking booking = bookingRepository.findById(paymentDto.bookingId())
                 .orElseThrow(()->new ResourceNotFoundException("Invalid Booking Id"));
 
         if(!booking.getUser().getAppUser().getUsername().equals(username)){
@@ -34,8 +38,9 @@ public class PaymentService {
         Payment payment = new Payment();
         payment.setBooking(booking);
         payment.setAmount(booking.getTotalAmount());
-        payment.setPaymentMethod(PaymentMethod.UPI);
+        payment.setPaymentMethod(paymentDto.paymentMethod());
         payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaymentTime(Instant.now());
         paymentRepository.save(payment);
 
         //updating status of booking
@@ -43,18 +48,26 @@ public class PaymentService {
         bookingRepository.save(booking);
 
         //fetching passengers by that booking id
-        List<Passenger> passengers = passengerRepository.findPassengerByBookingId(bookingId);
+        List<Passenger> passengers = passengerRepository.findPassengerByBookingId(paymentDto.bookingId());
 
         //updating seats from PENDING TO BOOKED
         passengers.forEach(passenger -> {
-            Seat seat = passenger.getSeat();
-            seat.setSeatStatus(SeatStatus.BOOKED);
-            seatRepository.save(seat);
+            if (passenger.getSeat() != null) {
+                Seat seat = passenger.getSeat();
+                seat.setSeatStatus(SeatStatus.BOOKED);
+                seatRepository.save(seat);
+            }
         });
 
         String passengerDetails = passengers
                 .stream()
-                .map(p->p.getName() + " - " + p.getSeat().getSeatNumber())
+                .map(p -> {
+                    if (p.getSeat() != null) {
+                        return p.getName() + " - " + p.getSeat().getSeatNumber();
+                    } else {
+                        return p.getName() + " - INFANT (No Seat)";
+                    }
+                })
                 .collect(Collectors.joining(", "));
 
         //create ticket
@@ -66,7 +79,7 @@ public class PaymentService {
         ticketRepository.save(ticket);
 
         return new TicketDto(
-              bookingId,
+              paymentDto.bookingId(),
               passengerDetails,
               TicketStatus.CONFIRMED,
               booking.getFlight().getFlight().getBaggageAllowed(),
@@ -76,5 +89,23 @@ public class PaymentService {
 
     public Payment findPaymentByBookingId(long bookingId) {
         return paymentRepository.findPaymentByBookingId(bookingId);
+    }
+
+    public void refundPaymentByBooking(long bookingId, String username) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(()->new ResourceNotFoundException("Invalid Booking id"));
+
+        if(!booking.getFlight().getFlight().getOwner().getAppUser().getUsername().equals(username)){
+            throw new UnauthorizedAccessException("No access to process refund for this payment");
+        }
+
+        if(booking.getBookingStatus() != CANCELLED){
+            throw new BookingNotCancelledException("This Booking is not cancelled");
+        }
+
+        Payment payment = paymentRepository.findPaymentByBookingId(bookingId);
+
+        payment.setStatus(PaymentStatus.REFUNDED);
+        paymentRepository.save(payment);
     }
 }

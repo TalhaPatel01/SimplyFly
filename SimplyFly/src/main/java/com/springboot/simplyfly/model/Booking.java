@@ -1,6 +1,7 @@
 package com.springboot.simplyfly.model;
 
 import com.springboot.simplyfly.enums.BookingStatus;
+import com.springboot.simplyfly.enums.SeatClass;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,6 +44,10 @@ public class Booking {
 
     @Column(name="seats_booked")
     private int seatsBooked;
+
+    @Column(name="seat_class")
+    @Enumerated(EnumType.STRING)
+    private SeatClass seatClass;
 
     @Column(name = "total_amount")
     private double totalAmount;

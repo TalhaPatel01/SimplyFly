@@ -17,6 +17,7 @@ public class OwnerMapper {
     public static OwnerResDto mapToDto(Owner owner){
         return new OwnerResDto(
              owner.getOwner_id(),
+             owner.getAppUser().getUsername(),
              owner.getAirline_name(),
              owner.getEmail(),
              owner.getPhone()

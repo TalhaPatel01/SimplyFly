@@ -14,6 +14,7 @@ public record FlightDetailsDto(
         LocalTime departureTime,
         int totalSeats,
         int availableSeats,
-        int baggageAllowed
+        int baggageAllowed,
+        int handCarryAllowed
 ) {
 }

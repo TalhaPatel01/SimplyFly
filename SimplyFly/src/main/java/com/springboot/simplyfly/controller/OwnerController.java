@@ -1,17 +1,20 @@
 package com.springboot.simplyfly.controller;
 
-import com.springboot.simplyfly.dto.OwnerPageDto;
-import com.springboot.simplyfly.dto.OwnerReqDto;
-import com.springboot.simplyfly.dto.OwnerResDto;
+import com.springboot.simplyfly.dto.*;
 import com.springboot.simplyfly.service.OwnerService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/owner")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class OwnerController {
     private final OwnerService ownerService;
 
@@ -32,6 +35,21 @@ public class OwnerController {
         return ownerService.getByOwnerId(id);
     }
 
-//    @PostMapping("/sign-up")
-//    public void addOwnerWithCredentials()
+    @PostMapping("/sign-up")
+    public void addOwnerWithCredentials(@Valid @RequestBody OwnerSignUpDto ownerSignUpDto){
+        ownerService.addOwnerWithCredentials(ownerSignUpDto);
+    }
+
+    //stats API
+    @GetMapping("/stats")
+    public OwnerStatResDto getOwnerStats(Principal principal){
+        String username = principal.getName();
+        return ownerService.getOwnerStats(username);
+    }
+
+    //top routes of owner
+    @GetMapping("/top-routes")
+    public List<TopRouteDto> getTopRoutes(Principal principal) {
+        return ownerService.getTopRoutes(principal.getName());
+    }
 }

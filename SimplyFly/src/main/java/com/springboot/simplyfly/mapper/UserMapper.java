@@ -17,6 +17,7 @@ public class UserMapper {
     public static UserResDto mapToDto(User user){
         return new UserResDto(
               user.getUser_id(),
+              user.getAppUser().getUsername(),
               user.getName(),
                 user.getEmail(),
                 user.getPhone_no()
